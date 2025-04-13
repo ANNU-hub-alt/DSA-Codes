@@ -1,87 +1,78 @@
-#include  "stdio.h"
-#include "stdlib.h"
-#include "limits.h"
-void printOptimal(int** s, int i, int j);
+#include <stdio.h>
+#include <stdlib.h>
 
-int main(){
-  int **table, **mats, **s, *p;
-  int matCount, i, j, k, min, l, pCount=0;
+void merge(int arr[], int beg, int mid, int end);
+void mergeSort(int arr[], int beg, int end);
 
-  printf("Number of Matrices: ");
-  scanf("%d", &matCount);
+int main()
+{
+    int arr[] = {50, 31, 21, 28, 72, 41, 73, 93, 68, 43, 45, 78, 5, 17, 97, 71, 69, 61, 88, 75, 99, 44, 55, 9};
+    int idx =0, len = 24;
 
-  table = (int**) malloc(sizeof(int*)*matCount);
-  s = (int**) malloc(sizeof(int*)*matCount);
-  mats = (int**) malloc(sizeof(int*)*matCount);
-  p = (int*) calloc(matCount*2, sizeof(int));
-
-  for(i =0; i<matCount; i++){
-    mats[i] = (int*) malloc(sizeof(int)*2);
-    printf("Enter Row Count of Mat %d: ", i+1);
-    scanf("%d", &mats[i][0]);
-
-    for(j=0; j< (matCount*2); j++){
-      if(mats[i][0] == p[j]){
-        break;
-      }else if(p[j] == 0){
-        p[j] = mats[i][0];
-        pCount++;
-        break;
-      }
-    }
-    printf("Enter Col Count of Mat %d: ", i+1);
-    scanf("%d", &mats[i][1]);
-
-
-    for(j=0; j< (matCount*2); j++){
-      if(mats[i][1] == p[j]){
-        break;
-      }else if(p[j] == 0){
-        p[j] = mats[i][1];
-        pCount++;
-        break;
-      }
+    printf("Before Sorting: ");
+    for (idx=0; idx < len; idx++)
+    {
+        printf("%d, ", arr[idx]);
     }
 
-    table[i] = (int*) malloc(sizeof(int)*matCount);
-    table[i][i] = 0;
+    mergeSort(arr, 0, len-1);
 
-    s[i] = (int*) calloc(matCount, sizeof(int));
-  }
-
-
-  for(l = 1; l<matCount;l++){
-
-    for(i=0; i<matCount-l;i++){
-      j = i+l;
-
-      table[i][j] = INT_MAX;
-      for(k=i;k<j;k++){
-
-        min = table[i][k] + table[k+1][j] + p[i]*p[k+1]*p[j+1];
-        if(min < table[i][j]){
-          table[i][j] = min;
-          s[i][j] = k+1;
-        }
-      }
+    printf("\nAfter Sorting: ");
+    for (idx=0; idx < len; idx++)
+    {
+        printf("%d, ", arr[idx]);
     }
-  }
-
-  printf("\n");
-  printOptimal(s, 0, matCount-1);
-  printf("\n");
-  return 0;
+    return 0;
 }
 
+void mergeSort(int arr[], int beg, int end)
+{
+    if (beg >= end) return;
+    int mid = (beg + end)/2;
+    mergeSort(arr, beg, mid);
+    mergeSort(arr, mid+1, end);
+    merge(arr, beg, mid, end);
+}
+void merge(int arr[], int beg, int mid, int end)
+{
+    int i = beg, j = mid+1, idx = 0, k=0;
+    int *temp = (int*) malloc(sizeof(int)*(end-beg));
 
-void printOptimal(int** s, int i, int j){
-  if(i==j){
-    printf("M%d", i);
-  }else {
-    printf("(");
-    printOptimal(s, i, s[i][j]-1);
-    printf("*");
-    printOptimal(s, s[i][j], j);
-    printf(")");
-  }
+
+    while (i <= mid && j <= end)
+    {
+        if (arr[i] < arr[j])
+        {
+            temp[idx] = arr[i];
+            i++;
+        }else
+        {
+            temp[idx] = arr[j];
+            j++;
+        }
+        idx++;
+    }
+
+    while (i<=mid)
+    {
+        temp[idx] = arr[i];
+        idx++;
+        i++;
+    }
+
+    while (j<=end)
+    {
+        temp[idx] = arr[j];
+        idx++;
+        j++;
+    }
+
+    k=0;
+    while (k < idx)
+    {
+
+        arr[k+beg]  = temp[k];
+        k++;
+    }
+    free(temp);
 }
